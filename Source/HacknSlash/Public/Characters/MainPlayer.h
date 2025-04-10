@@ -34,7 +34,12 @@ protected:
 
 	virtual UCombatComponent_Player* GetPlayerCombatComponent() override;
 	virtual AWeapon_Melee* GetMeleeWeapon() override;
+
+	UFUNCTION(BlueprintPure)
 	 virtual EPlayerStates GetCurrentState () override;
+
+	 UFUNCTION(BlueprintCallable)
+	 virtual void SetCurrentState(EPlayerStates State) override;
 
 public:	
 	// Called every frame

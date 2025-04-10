@@ -9,6 +9,7 @@
 #include "MotionWarpingComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Materials/MaterialInterface.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values for this component's properties
 UCombatComponent_Base::UCombatComponent_Base()
@@ -45,11 +46,21 @@ bool UCombatComponent_Base::TakeDamage(FDamageInfo DamageInfo)
 		
 		CalculateHitDirection(DamageInfo.DamageCauser->GetActorLocation(), HitDirectionName);
 		Stats.Health -= DamageInfo.HealthDamage;
-		NormalDamageResponse(DamageInfo.bOverrideDefaultHitResponse, DamageInfo.OverridenDamageResponseMontage, DamageInfo.HitLocation,DamageInfo.HitImpactNormal, DamageInfo.DamageCauser, HitDirectionName);
+		if (Stats.Health <= 0.f)
+		{
+			Die();
+		}
+		NormalDamageResponse(DamageInfo.bOverrideDefaultHitResponse, DamageInfo.OverridenDamageResponseMontage, DamageInfo.HitLocation,DamageInfo.HitBoneName,DamageInfo.HitImpactNormal,DamageInfo.LaunchSpeed, DamageInfo.DamageCauser, HitDirectionName);
 		return true;
 	}
 	
 	return false;
+}
+
+void UCombatComponent_Base::Die()
+{
+	OwningCharacter->GetMesh()->GetAnimInstance()->Montage_Play(DeathMontage);
+	OwningCharacter->SetLifeSpan(3.f);
 }
 
 
@@ -118,14 +129,33 @@ void UCombatComponent_Base::CalculateHitDirection(FVector DamageCauserLocation, 
 	}
 }
 
-void UCombatComponent_Base::NormalDamageResponse(bool bOverrideDefaultHitResponse, UAnimMontage* OverridenDamageResponseMontage, FVector HitLocation,FVector HitImpactNormal, AActor* DamageCauser, FName HitDirectionName)
+void UCombatComponent_Base::NormalDamageResponse(bool bOverrideDefaultHitResponse, UAnimMontage* OverridenDamageResponseMontage, FVector HitLocation, FName HitBoneName,FVector HitImpactNormal, float LaunchSpeed, AActor* DamageCauser, FName HitDirectionName)
 {
+	if (bIsDown)
+	{
+		OwningCharacter->LaunchCharacter(OwningCharacter->GetActorUpVector() * DownHitImpact, true, true);
+		
+		AnimInstance->Montage_Play(DownHitReactMontage);
+		// Bind montage end delegate to unlock movement
+		FOnMontageEnded MontageEndDelegate;
+		MontageEndDelegate.BindUObject(this, &UCombatComponent_Base::OnDamageResponseMontageEnded);
+		AnimInstance->Montage_SetEndDelegate(MontageEndDelegate, OverridenDamageResponseMontage);
+		return;
+	}
 	if (bOverrideDefaultHitResponse)
 	{
 
 		AnimInstance->Montage_Play(OverridenDamageResponseMontage);
 		AnimInstance->Montage_JumpToSection(HitDirectionName);
-
+		//Delay launch 
+		//Getting anim instance first 
+		OwningCharacter->LaunchCharacter(-OwningCharacter->GetActorForwardVector() * LaunchSpeed, true, true);
+		//// Create and bind the delegate with parameters 
+		//FTimerDelegate TimerDel;
+		//TimerDel.BindUFunction(OwningCharacter, FName("LaunchCharacter"), -OwningCharacter->GetActorForwardVector() * LaunchSpeed, true, true); // Passing int and float
+		//
+		//FTimerHandle TimerHandle;
+		//GetWorld()->GetTimerManager().SetTimer(TimerHandle,TimerDel,0.2f,false,0.f);
 
 		// Bind montage end delegate to unlock movement
 		FOnMontageEnded MontageEndDelegate;
@@ -138,7 +168,7 @@ void UCombatComponent_Base::NormalDamageResponse(bool bOverrideDefaultHitRespons
 	{
 		AnimInstance->Montage_Play(HitReactMontage);
 		AnimInstance->Montage_JumpToSection(HitDirectionName);
-
+		OwningCharacter->LaunchCharacter(-OwningCharacter->GetActorForwardVector() * LaunchSpeed, true, true);
 		// Bind montage end delegate to unlock movement
 		FOnMontageEnded MontageEndDelegate;
 		MontageEndDelegate.BindUObject(this, &UCombatComponent_Base::OnDamageResponseMontageEnded);
@@ -150,14 +180,14 @@ void UCombatComponent_Base::NormalDamageResponse(bool bOverrideDefaultHitRespons
 	// Play blood particle effects
 	for (auto* NiagaraParticle : Niagara_Blood_Particles)
 	{
-		UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraParticle, OwningCharacter->GetMesh(), FName("None"), HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
+		UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraParticle, OwningCharacter->GetMesh(), HitBoneName, HitLocation, FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, true);
 	}
 	// Play blood Decal effects
 	
 	if (Niagara_Blood_Decals)
 	{
 
-		UGameplayStatics::SpawnDecalAttached(Niagara_Blood_Decals, BloodDecalScale,OwningCharacter->GetMesh(),FName("None"), HitLocation,FRotationMatrix::MakeFromX(HitImpactNormal).Rotator(), EAttachLocation::KeepWorldPosition, 5.f);
+		UGameplayStatics::SpawnDecalAttached(Niagara_Blood_Decals, BloodDecalScale,OwningCharacter->GetMesh(), HitBoneName, HitLocation,FRotationMatrix::MakeFromX(HitImpactNormal).Rotator(), EAttachLocation::KeepWorldPosition, 15.f);
 	}
 
 	// Play sound

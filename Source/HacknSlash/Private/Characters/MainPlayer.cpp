@@ -66,6 +66,11 @@ EPlayerStates AMainPlayer::GetCurrentState()
 	return CurrentState;
 }
 
+void AMainPlayer::SetCurrentState(EPlayerStates State)
+{
+	CurrentState = State;
+}
+
 
 // Called every frame
 void AMainPlayer::Tick(float DeltaTime)
@@ -140,7 +145,15 @@ void AMainPlayer::ActionMove(const FInputActionValue& Value)
 
 void AMainPlayer::ActionJump(const FInputActionValue& Value)
 {
-	Jump();
+	if (GetCurrentState() == EPlayerStates::EPS_Passive)
+	{
+		Jump();
+
+	}
+	else
+	{
+		StopJumping();
+	}
 }
 
 void AMainPlayer::ActionStopJump(const FInputActionValue& Value)
@@ -159,48 +172,37 @@ void AMainPlayer::ActionHeavyAttack(const FInputActionValue& Value)
 
 void AMainPlayer::ActionDodge(const FInputActionValue& Value)
 {
-	FVector2D MovementVector = Value.Get<FVector2D>();
-	FName Direction = "";
-;	if (MovementVector.Y > 0.0f)
+	if (GetCurrentState() == EPlayerStates::EPS_Dodge || GetCurrentState() == EPlayerStates::EPS_Attack)
 	{
-		Direction = (FName("F"));
+		CombatComponent->bContinueDodge = true;
 	}
 
-	else if (MovementVector.Y < 0.0f)
+	else
 	{
-		Direction = (FName("B"));
+		if (CombatComponent->CanDodge())
+		{
+			//Clear Attack Variables
+			CombatComponent->bSwitchHeavyCombo = false;
+			CombatComponent->bSwitchLightCombo = false;
+			CombatComponent->LightAttackIndex = 0;
+			CombatComponent->HeavyAttackIndex = 0;
+
+			//DodgeDirection
+			FRotator Rotator =  FRotationMatrix::MakeFromX(GetCharacterMovement()->GetLastInputVector()).Rotator();
+
+			FRotator Rot = GetCharacterMovement()->GetLastInputVector() != FVector(0.f) ? Rotator : FRotator(0.f);
+
+			if (Rot != FRotator(0.f))
+			{
+				SetActorRotation(Rot);
+				CombatComponent->PerformDodge(DodgeMontage);
+			}
+			else if (Rot == FRotator(0.f))
+			{
+				CombatComponent->PerformDodge(DodgeMontage);
+			}
+		}
 	}
 
-	else if (MovementVector.X > 0.0f)
-	{
-	Direction = (FName("R"));
-	}
-
-	else if (MovementVector.X < 0.0f)
-	{
-	Direction = (FName("L"));
-	}
-	/*else if (MovementVector.Y > 0.0f)
-	{
-	Direction = (FName("F"));
-	}
-
-	else if (MovementVector.Y < 0.0f)
-	{
-	Direction = (FName("B"));
-	}
-
-	else if (MovementVector.X > 0.0f)
-	{
-	Direction = (FName("R"));
-	}
-
-	else if (MovementVector.X < 0.0f)
-	{
-	Direction = (FName("L"));
-	}*/
-
-	GetMesh()->GetAnimInstance()->Montage_Play(DodgeMontage);
-	GetMesh()->GetAnimInstance()->Montage_JumpToSection(Direction);
 }
 

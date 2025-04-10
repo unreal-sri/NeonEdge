@@ -49,7 +49,7 @@ protected:
 	bool bCanBeDodged = true;
 
 	UPROPERTY(EditAnywhere, Category = "DamageInfo", BlueprintReadWrite)
-	float LaunchSpeed = 400.0f;
+	float LaunchSpeed = 100.f;
 
 	UPROPERTY(EditAnywhere, Category = "DamageInfo", BlueprintReadWrite)
 	bool bOverrideDefaultHitResponse;

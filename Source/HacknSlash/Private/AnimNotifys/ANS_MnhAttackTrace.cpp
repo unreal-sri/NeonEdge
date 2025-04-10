@@ -50,13 +50,15 @@ void UANS_MnhAttackTrace::OnHitDetected(FGameplayTag TracerTag, FHitResult HitRe
 	DamageInfo.HitImpactNormal = HitResult.ImpactNormal;
 	DamageInfo.ResponseType = ResponseType; 
 	DamageInfo.DamageCauser = Owner;
+	DamageInfo.LaunchSpeed = LaunchSpeed;
 
 
 	if (auto* CharacterInterface = Cast<IInterfaceCharacter>(HitResult.GetActor()))
 	{
-		GEngine->AddOnScreenDebugMessage(4, 5.f, FColor::Black, FString::Printf(TEXT("Actor Name: %s"), *HitResult.GetActor()->GetName()));
 		if (!(ActorsToIgnore.Contains(HitResult.GetActor())))
 		{
+
+			
 			if (auto* CombatComp = CharacterInterface->GetCombatComponent())
 			{
 				if (//!CombatComp->IsOnSameTeam(Owner)
@@ -68,6 +70,7 @@ void UANS_MnhAttackTrace::OnHitDetected(FGameplayTag TracerTag, FHitResult HitRe
 					if (true)
 					{
 						DamageInfo.HitLocation = HitResult.ImpactPoint;
+						DamageInfo.HitBoneName = HitResult.BoneName;
 						CombatComp->TakeDamage(DamageInfo);
 						UAISense_Damage::ReportDamageEvent(GetWorld(), HitResult.GetActor(), Owner, DamageInfo.HealthDamage, HitResult.Location, HitResult.Location);
 					}

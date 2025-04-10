@@ -132,7 +132,13 @@ public:
 	FVector HitLocation;
 
 	UPROPERTY(VisibleAnywhere, Category = "DamageInfo", BlueprintReadOnly)
+	FName HitBoneName;
+
+	UPROPERTY(VisibleAnywhere, Category = "DamageInfo", BlueprintReadOnly)
 	FVector HitImpactNormal;
+
+	UPROPERTY(EditAnywhere, Category = "DamageInfo", BlueprintReadWrite)
+	float LaunchSpeed;
 
 	UPROPERTY(EditAnywhere, Category = "DamageInfo", BlueprintReadWrite)
 	EDamageResponse ResponseType;

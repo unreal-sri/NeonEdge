@@ -50,7 +50,7 @@ public:
 	//UI
 
 	//FORCEINLINE  virtual UUW_MainOverlay* GetMainOverlay() { return nullptr; };
-
+	 
 	//UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	//UUW_Stats* GetStatsWidget();
 
@@ -62,7 +62,9 @@ public:
 	FORCEINLINE virtual UBehaviorTree* GetBehaviorTree() { return nullptr; };
 	FORCEINLINE virtual UCameraComponent* GetFollowCameraComponent() { return nullptr; };
 	FORCEINLINE virtual UMotionWarpingComponent* GetMotionWarpComponent() { return nullptr; };
-	//FORCEINLINE virtual USceneComponent* GetTakedownTargetScene() { return nullptr; };
+
+	//Setters
+   virtual void SetCurrentState(EPlayerStates State) {};
 
 	//UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	//AAIMovementPath* GetAIMovementPath();

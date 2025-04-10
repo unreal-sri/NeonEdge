@@ -35,8 +35,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual bool TakeDamage(FDamageInfo DamageInfo);
+	virtual void Die();
 
-	void NormalDamageResponse(bool bOverrideDefaultHitResponse, UAnimMontage* OverridenDamageResponseMontage, FVector HitLocation,FVector ImpactNormal, AActor* DamageCauser, FName HitDirectionName);
+	void NormalDamageResponse(bool bOverrideDefaultHitResponse, UAnimMontage* OverridenDamageResponseMontage, FVector HitLocation,FName HitBoneName, FVector ImpactNormal,float LaunchSpeed, AActor* DamageCauser, FName HitDirectionName);
 	/*virtual void BlockDamageResponse(bool bOverrideDefaultHitResponse, UAnimMontage* OverridenDamageResponseMontage, bool bOverrideDefaultParryResponse, UAnimMontage* OverridenParryResponseMontage, float LaunchSpeed, FVector HitLocation);
 	virtual void GotParriedDamageResponse(bool bOverrideDefaultHitResponse, UAnimMontage* OverridenDamageResponseMontage);*/
 
@@ -48,6 +49,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages|Combat")
 	UAnimMontage* HitReactMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages|Combat")
+	UAnimMontage* DownHitReactMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages|Combat")
+	UAnimMontage* DeathMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages|Combat")
+	bool bIsDown;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages|Combat")
+	float DownHitImpact = 400.f;
 
 
 	// Character Stats
