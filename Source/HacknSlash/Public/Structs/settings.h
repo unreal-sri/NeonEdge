@@ -117,10 +117,10 @@ public:
 	float HealthDamage;
 
 	UPROPERTY(EditAnywhere, Category = "DamageInfo", BlueprintReadWrite)
-	float BalanceDamage;
+	float HitStopDuration;
 
 	UPROPERTY(EditAnywhere, Category = "DamageInfo", BlueprintReadWrite)
-	bool bCanBeDodged;
+	bool bIsAirBone;
 
 	UPROPERTY(EditAnywhere, Category = "DamageInfo", BlueprintReadWrite)
 	bool bOverrideDefaultHitResponse;

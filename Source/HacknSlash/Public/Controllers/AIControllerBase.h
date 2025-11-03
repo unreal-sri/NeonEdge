@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include <Interfaces/InterfaceController.h>
 #include "AIControllerBase.generated.h"
 
 /**
@@ -18,7 +19,7 @@ class UBehaviorTree;
 class UBrainComponent;
 
 UCLASS()
-class HACKNSLASH_API AAIControllerBase : public AAIController
+class HACKNSLASH_API AAIControllerBase : public AAIController , public IInterfaceController
 {
 	GENERATED_BODY()
 
@@ -27,7 +28,15 @@ class HACKNSLASH_API AAIControllerBase : public AAIController
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
-	virtual UBrainComponent* GetBrainComp();
+	virtual EAIStates GetAIState() override;
+	virtual void SetStateAsPassive() override;
+	virtual void SetStateAsAttacking() override;
+	virtual void SetStateAsFrozen() override;
+	virtual void SetStateAsDead() override;
+	virtual void SetStateAsInvestigating(FVector Location) override;
+	virtual void SetIsGettingHit(bool bIsGettingHit) override;
+	virtual  UBrainComponent* GetBrainComp() override;
+	
 	//UFUNCTION()
 	//virtual void OnPerceptionUpdated(const TArray<AActor*>& DetectedPawn);
 
@@ -51,5 +60,7 @@ protected:
 	FName AttackTargetKeyName;
 	FName AttackRadiusKeyName;
 	FName IsGettingHitKeyName;
+
+
 
 };

@@ -62,6 +62,8 @@ enum class EPlayerStates : uint8
 	EPS_Passive UMETA(DisplayName = "Passive"),
 	EPS_Attack UMETA(DisplayName = "Attack"),
 	EPS_Frozen UMETA(DisplayName = "Frozen"),
+	EPS_Airbone UMETA(DisplayName = "Airbone"),
+	EPS_AirAttack UMETA(DisplayName = "AirAttack"),
 	EPS_Dodge UMETA(DisplayName = "Dodge"),
 	EPS_Dead UMETA(DisplayName = "Dead")
 };

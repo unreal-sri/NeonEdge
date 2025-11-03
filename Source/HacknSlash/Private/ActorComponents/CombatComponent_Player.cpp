@@ -32,7 +32,9 @@ void UCombatComponent_Player::TickComponent(float DeltaTime, ELevelTick TickType
 	
 	
 	//ROtating Character
-	if (NewCharRotation != FRotator(0.f) && Cast<IInterfaceCharacter>(GetOwner())->GetCurrentState() == EPlayerStates::EPS_Attack && !EnemyInRange)
+	if (NewCharRotation != FRotator(0.f) 
+		&& Cast<IInterfaceCharacter>(GetOwner())->GetCurrentState() == EPlayerStates::EPS_Attack
+		&& !EnemyInRange )
 	{
 		RotateCharacterInterp();
 	}
@@ -46,14 +48,18 @@ void UCombatComponent_Player::TraceForNearbyEnemies(float DeltaTime)
 	auto* PlayerController = GetOwner()->GetInstigator()->GetController();
 	FVector ViewPointLoc;
 	FRotator ViewPointRot;
-	PlayerController->GetPlayerViewPoint(ViewPointLoc, ViewPointRot);
+	if (!PlayerController)
+	{
+		return;
+	}
+		PlayerController->GetPlayerViewPoint(ViewPointLoc, ViewPointRot);
 	ViewPointLoc = FVector(ViewPointLoc.X, ViewPointLoc.Y, GetOwner()->GetActorLocation().Z);
 	ViewPointRot.Pitch = 0.f;
 	FVector New = UKismetMathLibrary::GetForwardVector(ViewPointRot) * 700.f;
 
 	End = ViewPointLoc + New;
 
-	UKismetSystemLibrary::CapsuleTraceMultiByProfile(GetWorld(), Start, End, 90.f, 88.f, "Enemy", false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, HitResult, true);
+	UKismetSystemLibrary::CapsuleTraceMultiByProfile(GetWorld(), Start, End, 110.f, 88.f, "Enemy", false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true);
 	//Set the enemy to snap to
 	if (!(HitResult.Num() == 0))
 	{
@@ -134,17 +140,66 @@ void UCombatComponent_Player::PerformLightAttack(int32 Index)
 
 }
 
+void UCombatComponent_Player::PerformAirAttack(int32 Index)
+{
+	if (Index >= AirAttackMontages.Num())
+	{
+
+		AirAttackIndex = 0;
+	}
+
+	if (UAnimMontage* AirAttack = AirAttackMontages[AirAttackIndex])
+	{
+		if (auto* CharacterInterface = Cast<IInterfaceCharacter>(GetOwner()))
+		{
+			CharacterInterface->SetCurrentState(EPlayerStates::EPS_AirAttack);
+			OwningCharacter->GetMesh()->GetAnimInstance()->Montage_Play(AirAttack);
+			AirAttackIndex += 1;
+			//if (!EnemyInRange)
+			//{
+			//	//Creating a Rotator based on last input
+			//	FRotator Rotator = FRotationMatrix::MakeFromX(OwningCharacter->GetCharacterMovement()->GetLastInputVector()).Rotator();
+			//	//If the input is valid a tick function starts to rotate character facing that direction
+			//	NewCharRotation = OwningCharacter->GetCharacterMovement()->GetLastInputVector() != FVector(0.f) ? Rotator : FRotator(0.f);
+			//}
+
+
+		}
+		AirAttack = nullptr;
+	}
+
+}
+
 bool UCombatComponent_Player::CanAttack()
 {
 	if (auto* CharacterInterface = Cast<IInterfaceCharacter>(GetOwner()))
 	{
 		//States where cannot attack
-		if (CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Attack || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Dodge ||
-			CharacterInterface->GetCurrentState()== EPlayerStates::EPS_Frozen || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Dead || OwningCharacter->GetCharacterMovement()->IsFalling())
+		if (CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Attack || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Dodge || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Airbone ||
+			CharacterInterface->GetCurrentState()== EPlayerStates::EPS_Frozen || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Dead || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_AirAttack || 
+			OwningCharacter->GetCharacterMovement()->IsFalling())
 		{
 			return false;
 		}
 		return true;
+	}
+	return false;
+}
+
+bool UCombatComponent_Player::CanAirAttack()
+{
+	if (auto* CharacterInterface = Cast<IInterfaceCharacter>(GetOwner()))
+	{
+		//States where cannot attack
+		if (CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Attack || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Dodge || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_AirAttack||
+			CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Frozen || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Dead || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Passive)
+		{
+			return false;
+		}
+		else if (CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Airbone)
+		{
+			return true;
+		}
 	}
 	return false;
 }
@@ -154,7 +209,7 @@ bool UCombatComponent_Player::CanDodge()
 	if (auto* CharacterInterface = Cast<IInterfaceCharacter>(GetOwner()))
 	{
 		//States where cannot Dodge
-		if (CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Attack || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Dodge ||
+		if (CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Attack || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Dodge || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Airbone ||
 			CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Frozen || CharacterInterface->GetCurrentState() == EPlayerStates::EPS_Dead || OwningCharacter->GetCharacterMovement()->IsFalling())
 		{
 			return false;
@@ -199,5 +254,6 @@ void UCombatComponent_Player::PerformDodge(UAnimMontage* Dodge)
 	}
 
 }
+
 
 

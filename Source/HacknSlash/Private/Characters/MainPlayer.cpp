@@ -115,7 +115,6 @@ void AMainPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void AMainPlayer::ActionLook(const FInputActionValue& Value)
 {
 	FVector2D LookingVector = Value.Get<FVector2D>();
-	UE_LOG(LogTemp, Warning, TEXT("Looking: %f"), LookingVector.X);
 
 		if (GetController())
 		{
@@ -145,7 +144,7 @@ void AMainPlayer::ActionMove(const FInputActionValue& Value)
 
 void AMainPlayer::ActionJump(const FInputActionValue& Value)
 {
-	if (GetCurrentState() == EPlayerStates::EPS_Passive)
+	/*if (GetCurrentState() == EPlayerStates::EPS_Passive)
 	{
 		Jump();
 
@@ -153,12 +152,12 @@ void AMainPlayer::ActionJump(const FInputActionValue& Value)
 	else
 	{
 		StopJumping();
-	}
+	}*/
 }
 
 void AMainPlayer::ActionStopJump(const FInputActionValue& Value)
 {
-	StopJumping();
+	/*StopJumping();*/
 }
 
 void AMainPlayer::ActionLightAttack(const FInputActionValue& Value)

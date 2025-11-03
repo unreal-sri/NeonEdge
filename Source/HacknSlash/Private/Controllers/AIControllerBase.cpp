@@ -18,6 +18,8 @@
 	 PrimaryActorTick.bCanEverTick = true;
 
 	 AttackTargetKeyName = "Target";
+	 StateKeyName = "AIState";
+	 PointOfInterestKeyName = "PointOfInterest";
 }
 
 
@@ -48,6 +50,16 @@ void AAIControllerBase::OnPossess(APawn* InPawn)
 
 }
 
+EAIStates AAIControllerBase::GetAIState()
+{
+	if (Blackboard)
+	{
+		EAIStates State = static_cast<EAIStates>(Blackboard->GetValueAsEnum(StateKeyName));
+		return State;
+	}
+	return EAIStates();
+}
+
 void AAIControllerBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -64,4 +76,57 @@ void AAIControllerBase::Tick(float DeltaTime)
 UBrainComponent* AAIControllerBase::GetBrainComp()
 {
 	return nullptr;
+}
+
+void AAIControllerBase::SetStateAsPassive()
+{
+	if (Blackboard)
+	{
+		Blackboard->SetValueAsEnum(StateKeyName, static_cast<uint8>(EAIStates::EAIS_Passive));
+	}
+}
+
+void AAIControllerBase::SetStateAsAttacking()
+{
+
+	if (Blackboard)
+	{
+		Blackboard->SetValueAsEnum(StateKeyName, static_cast<uint8>(EAIStates::EAIS_Attacking));
+	}
+
+
+
+}
+
+void AAIControllerBase::SetStateAsFrozen()
+{
+	if (Blackboard)
+	{
+		Blackboard->SetValueAsEnum(StateKeyName, static_cast<uint8>(EAIStates::EAIS_Frozen));
+	}
+}
+
+void AAIControllerBase::SetStateAsDead()
+{
+	if (Blackboard)
+	{
+		Blackboard->SetValueAsEnum(StateKeyName, static_cast<uint8>(EAIStates::EAIS_Dead));
+	}
+}
+
+void AAIControllerBase::SetStateAsInvestigating(FVector Location)
+{
+	if (Blackboard)
+	{
+		Blackboard->SetValueAsEnum(StateKeyName, static_cast<uint8>(EAIStates::EAIS_Investigating));
+		Blackboard->SetValueAsVector(PointOfInterestKeyName, Location);
+	}
+}
+
+void AAIControllerBase::SetIsGettingHit(bool bIsGettingHit)
+{
+	if (Blackboard)
+	{
+		Blackboard->SetValueAsBool(IsGettingHitKeyName, bIsGettingHit);
+	}
 }

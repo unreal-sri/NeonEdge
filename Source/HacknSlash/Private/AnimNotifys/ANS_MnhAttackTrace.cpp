@@ -43,8 +43,8 @@ void UANS_MnhAttackTrace::OnHitDetected(FGameplayTag TracerTag, FHitResult HitRe
 	FDamageInfo DamageInfo;
 
 	DamageInfo.HealthDamage = HealthDamage;
-	DamageInfo.BalanceDamage = BalanceDamage;
-	DamageInfo.bCanBeDodged = bCanBeDodged;
+	DamageInfo.HitStopDuration = HitStopDuration;
+	DamageInfo.bIsAirBone = bIsAirbone;
 	DamageInfo.bOverrideDefaultHitResponse = bOverrideDefaultHitResponse;
 	DamageInfo.OverridenDamageResponseMontage = OverridenDamageResponseMontage;
 	DamageInfo.HitImpactNormal = HitResult.ImpactNormal;
@@ -64,8 +64,8 @@ void UANS_MnhAttackTrace::OnHitDetected(FGameplayTag TracerTag, FHitResult HitRe
 				if (//!CombatComp->IsOnSameTeam(Owner)
 					true)
 				{
-					DamageInfo.HealthDamage = HealthDamage * CombatComp->StatsScale.SwordPower;
-					DamageInfo.BalanceDamage = BalanceDamage * CombatComp->StatsScale.SwordPower;
+				/*	DamageInfo.HealthDamage = HealthDamage * CombatComp->StatsScale.SwordPower;
+					DamageInfo.BalanceDamage = BalanceDamage * CombatComp->StatsScale.SwordPower;*/
 
 					if (true)
 					{
@@ -85,6 +85,7 @@ void UANS_MnhAttackTrace::OnHitDetected(FGameplayTag TracerTag, FHitResult HitRe
 
 void UANS_MnhAttackTrace::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime, const FAnimNotifyEventReference& EventReference)
 {
+
 }
 
 void UANS_MnhAttackTrace::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)

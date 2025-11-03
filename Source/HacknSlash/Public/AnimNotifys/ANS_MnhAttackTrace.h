@@ -37,13 +37,13 @@ protected:
 	float HealthDamage = 10.0f;
 
 	UPROPERTY(EditAnywhere)
-	float BalanceDamage = 10.0f;
+	float HitStopDuration = 0.04f;
 
 	UPROPERTY(EditAnywhere, Category = "DamageInfo", BlueprintReadWrite)
 	bool bCanBeBlocked = true;
 
 	UPROPERTY(EditAnywhere, Category = "DamageInfo", BlueprintReadWrite)
-	bool bCanBeParried = true;
+	bool bIsAirbone = false;
 
 	UPROPERTY(EditAnywhere, Category = "DamageInfo", BlueprintReadWrite)
 	bool bCanBeDodged = true;

@@ -54,8 +54,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void PerformLightAttack(int32 Index);
 
+	UFUNCTION(BlueprintCallable)
+	void PerformAirAttack(int32 Index);
+
 	UFUNCTION(BlueprintPure)
 	bool CanAttack();
+
+	UFUNCTION(BlueprintPure)
+	bool CanAirAttack();
 
 	UFUNCTION(BlueprintPure)
 	bool CanDodge();
@@ -86,6 +92,9 @@ public:
 	int32 LightAttackIndex;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+	int32 AirAttackIndex;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
 	int32 HeavyAttackIndex;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
@@ -103,7 +112,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	TArray <UAnimMontage*> ComboExtenderMontages;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TArray <UAnimMontage*> AirAttackMontages;
+
 public:
+
+
+
+
+
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Attack|Combo");
 	bool bSwitchLightCombo;
@@ -113,5 +131,8 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Attack|Dodge");
 	bool bContinueDodge;
+
+
+
 
 };

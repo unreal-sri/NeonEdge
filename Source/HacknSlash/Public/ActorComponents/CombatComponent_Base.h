@@ -25,8 +25,18 @@ public:
 	// Sets default values for this component's properties
 	UCombatComponent_Base();
 
+protected:
 
-private:
+	
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+
+
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 
 	ACharacter* OwningCharacter;
 	UAnimInstance* AnimInstance;
@@ -37,10 +47,9 @@ public:
 	virtual bool TakeDamage(FDamageInfo DamageInfo);
 	virtual void Die();
 
-	void NormalDamageResponse(bool bOverrideDefaultHitResponse, UAnimMontage* OverridenDamageResponseMontage, FVector HitLocation,FName HitBoneName, FVector ImpactNormal,float LaunchSpeed, AActor* DamageCauser, FName HitDirectionName);
+	virtual void NormalDamageResponse(FDamageInfo DamageInfo, FName HitDireactionName);
 	/*virtual void BlockDamageResponse(bool bOverrideDefaultHitResponse, UAnimMontage* OverridenDamageResponseMontage, bool bOverrideDefaultParryResponse, UAnimMontage* OverridenParryResponseMontage, float LaunchSpeed, FVector HitLocation);
 	virtual void GotParriedDamageResponse(bool bOverrideDefaultHitResponse, UAnimMontage* OverridenDamageResponseMontage);*/
-
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -52,6 +61,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages|Combat")
 	UAnimMontage* DownHitReactMontage;
 
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages|Combat")
 	UAnimMontage* DeathMontage;
 
@@ -59,9 +69,11 @@ public:
 	bool bIsDown;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages|Combat")
+	bool bIsAirbone;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montages|Combat")
 	float DownHitImpact = 400.f;
-
-
 	// Character Stats
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -81,24 +93,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Sounds", BlueprintReadOnly)
 	USoundBase* NormalHit_Sound;
 
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
-
-
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	void CalculateHitDirection(FVector DamageCauserLocation, FName& Section);
+	virtual void OnDamageResponseMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
-	
-
-	void OnDamageResponseMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-
-
+	FORCEINLINE ACharacter* GetOwningCharacter() { return OwningCharacter; }
 
 		
 };
